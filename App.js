@@ -1,41 +1,42 @@
 import React, {useState} from 'react';
 import { StyleSheet, Text,
-         View, TextInput, Button,
-         ScrollView, FlatList
+         View, FlatList, Button
        } from 'react-native';
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState('');
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddModel, setIsAddModel] = useState(false);
 
-  const getInputGoalHandler = (goal) => {
-     setEnteredGoal(goal);
-  }
-  const addGoalHandler = () => {
+  const addGoalHandler = (goal) => {
     setCourseGoals(courseGoals => [...courseGoals,
-       {id: Math.random().toString(), value: enteredGoal}]);
+       {id: Math.random().toString(), value: goal}]);
+    setIsAddModel(false);
+  }
+
+  const cancelGoalAdditionHandler = () =>{
+    setIsAddModel(false);
+  }
+
+  const onDeleteGoalHandler = goalId => {
+    setCourseGoals(courseGoals => {
+      return courseGoals.filter((goal) => goal.id !== goalId);
+    })
   }
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-       <TextInput placeholder="Course Goal" 
-       style={styles.input} 
-       onChangeText={getInputGoalHandler}
-       value={enteredGoal}
-       />
-       <Button title="ADD" onPress={addGoalHandler}/>
-      </View>
-        {courseGoals.length!=0?
+        <Button title="Add New Goal" onPress={() => setIsAddModel(true)}/>
+        <GoalInput
+         visible={isAddModel}
+         onCancelModal={cancelGoalAdditionHandler}
+         onAddGoal = {addGoalHandler}/>
+         {courseGoals.length!=0?
          <FlatList data={courseGoals}
-         renderItem={({item: {value}}) =>(
-            <View style={styles.listItem}>
-               <Text>{value}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-          />
+          renderItem={itemData =><GoalItem onDelete={onDeleteGoalHandler} itemData = {itemData}/>}
+          keyExtractor={item => item.id}/>
         :
-        <Text>Start adding your goals!</Text>
+        <Text style={styles.feedbackContainer}>I'll keep your goals!</Text>
         }   
     </View>
   );
@@ -45,21 +46,8 @@ const styles = StyleSheet.create({
    screen:{
     padding: 50
    },
-   inputContainer:{
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center'
-   },
-   input: {
-    width:'80%',
-    borderBottomColor:'black',
-    borderBottomWidth: 1
-    },
-    listItem:{
-      padding: 10,
-      marginVertical: 5,
-      backgroundColor: '#ccc',
-      borderColor:'#f0f0',
-      borderWidth: 1
-    }
+   feedbackContainer:{
+    textAlign:'center',
+    marginTop: 20
+  }
 });
