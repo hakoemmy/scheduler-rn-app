@@ -3,7 +3,7 @@ import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 
 const goalItem = ({itemData:{item}, onDelete}) => {
     return (
-        <TouchableOpacity onLongPress={onDelete}>
+        <TouchableOpacity onLongPress={() =>onDelete(item.id)}>
         <View style={styles.listItem}>
             <Text>{item.value}</Text>
         </View>
